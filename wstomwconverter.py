@@ -47,6 +47,9 @@ class WikispacesToMediawikiConverter:
     def run(self):
         '''Run some regexps on the source.'''
         
+        # remove the [[toc]] since mediawiki does it by default
+        self.content = re.sub(r'\[\[toc(\|flat)?\]\]', r'', self.content)
+        
         #change italics from // to ''
         self.content = re.sub(r'(?<!http:)(?<!https:)(?<!ftp:)//', r"''", self.content)
         
