@@ -6,7 +6,8 @@ class VersionInfo:
     '''Just a container for some information.'''
     version = '0.0.1'
     name = 'Wikispaces To MediaWiki Converter'
-    url = 'tba'
+    url = 'http://wiki.df.dreamhosters.com/wiki/Wikispaces_to_Mediawiki_Converter'
+    author='Daniel Folkinshteyn'
     
 class Starter:
     '''Grabs cli options, and runs the converter on specified files.'''
