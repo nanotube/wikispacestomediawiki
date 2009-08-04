@@ -52,7 +52,12 @@ class Starter:
             print "Your commandline options:\n", self.options
 
 class WikispacesToMediawikiConverter:
-    '''The actual converter: reads in file, converts, outputs.'''
+    '''The actual converter: reads in file, converts, outputs.
+    
+    Reference material:
+    http://www.mediawiki.org/wiki/Help:Formatting
+    http://www.wikispaces.com/wikitext
+    '''
     def __init__(self, filepath, options):
         self.filepath = filepath
         self.options = options
@@ -127,20 +132,36 @@ class WikispacesToMediawikiConverter:
         
         various image attributes are supported:
         align, width, height, caption, link.
+        
+        reference material: 
+        http://www.mediawiki.org/wiki/Help:Images
+        http://www.wikispaces.com/image+tags
         '''
         def image_parse(matchobj):
             imagetag = matchobj.group(0)
             if self.options.debug:
                 print imagetag
             image_filename = re.search(r'\[\[image:([^ ]*)', imagetag).group(1)
+            
             try:
                 image_width = re.search(r'width="(\d+?)"', imagetag).group(1)
             except AttributeError:
                 image_width = None
-            if image_width is not None:
-                image_width = '|' + image_width + 'px'
+            
+            try:
+                image_height = re.search(r'height="(\d+?)"', imagetag).group(1)
+            except AttributeError:
+                image_height = None
+                
+            if image_width is not None and image_height is not None:
+                image_size = '|' + image_width + 'x' + image_height + 'px'
+            elif image_width is not None and image_height is None:
+                image_size = '|' + image_width + 'px'
+            elif image_width is None and image_height is not None:
+                image_size = '|' + 'x' + image_height + 'px'
             else:
-                image_width = ''
+                image_size = ''
+            
             try:
                 image_align = re.search(r'align="(.*?)"', imagetag).group(1)
             except AttributeError:
@@ -149,6 +170,7 @@ class WikispacesToMediawikiConverter:
                 image_align = '|' + image_align
             else:
                 image_align = ''
+            
             try:
                 image_comment = re.search(r'caption="(.*?)"', imagetag).group(1)
             except AttributeError:
@@ -157,8 +179,25 @@ class WikispacesToMediawikiConverter:
                 image_comment = '|' + image_comment
             else:
                 image_comment = ''
-                
-            return '[[File:' + image_filename + image_width + image_align + image_comment
+            
+            try:
+                image_link = re.search(r'link="(.*?)"', imagetag).group(1)
+            except AttributeError:
+                image_link = None
+            if image_link is not None:
+                image_link = '|' + 'link=' + image_link
+            else:
+                image_link = ''
+            
+            # in MW, thumbs cannot be links, but otherwise, a thumb is the 
+            # best representation of a captioned wikispaces image.
+            if image_comment != '' and image_link == '':
+                image_thumb = '|thumb'
+            else:
+                image_thumb = ''
+            
+            return '[[File:' + image_filename + image_thumb + image_size + \
+                        image_align + image_link + image_comment
             
         self.content = re.sub(r'\[\[image:[^\]]+', image_parse, self.content)
     

@@ -220,15 +220,21 @@ A paragraph with an image:
 A paragraph with a simpler image: [[image:somefile.gif]]
 
 A paragraph with a medium-complexity image: [[image:somefile.gif height="80" align="right"]]
+
+An image that should become a thumb:
+[[image:somefile.gif width="20" height="80" align="left" caption="some caption"]]
 """
         self.target_wikitext = \
 """
 A paragraph with an image:
-[[File:somefile.gif|20px|left|some caption]].
+[[File:somefile.gif|20x80px|left|link=http://example.com|some caption]].
 
 A paragraph with a simpler image: [[File:somefile.gif]]
 
-A paragraph with a medium-complexity image: [[File:somefile.gif|right]]
+A paragraph with a medium-complexity image: [[File:somefile.gif|x80px|right]]
+
+An image that should become a thumb:
+[[File:somefile.gif|thumb|20x80px|left|some caption]]
 """
         self.converter.content = self.source_wikitext
         self.converter.run_regexps()
