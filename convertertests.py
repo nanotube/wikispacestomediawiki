@@ -32,13 +32,7 @@ bold text'''
 """
         self.converter.content = self.source_wikitext
         self.converter.run_regexps()
-        try:
-            self.assertEqual(self.converter.content, self.target_wikitext)
-        except:
-            print 'source:\n', self.source_wikitext
-            print 'result:\n', self.converter.content
-            print 'target:\n', self.target_wikitext
-            raise
+        self.assertEqual(self.converter.content, self.target_wikitext)
 
     def test_bold_lists(self):
         self.source_wikitext = \
@@ -57,13 +51,7 @@ bold text'''
 """
         self.converter.content = self.source_wikitext
         self.converter.run_regexps()
-        try:
-            self.assertEqual(self.converter.content, self.target_wikitext)
-        except:
-            print 'source:\n', self.source_wikitext
-            print 'result:\n', self.converter.content
-            print 'target:\n', self.target_wikitext
-            raise
+        self.assertEqual(self.converter.content, self.target_wikitext)
 
     def test_bold_tricky(self):
         self.source_wikitext = \
@@ -76,13 +64,7 @@ Some tricky stuff: '''*''' this should parse as a bolded star.
 """
         self.converter.content = self.source_wikitext
         self.converter.run_regexps()
-        try:
-            self.assertEqual(self.converter.content, self.target_wikitext)
-        except:
-            print 'source:\n', self.source_wikitext
-            print 'result:\n', self.converter.content
-            print 'target:\n', self.target_wikitext
-            raise
+        self.assertEqual(self.converter.content, self.target_wikitext)
 
     def test_italics_simple(self):
         self.source_wikitext = \
@@ -101,13 +83,7 @@ italicized'' text.
 """
         self.converter.content = self.source_wikitext
         self.converter.run_regexps()
-        try:
-            self.assertEqual(self.converter.content, self.target_wikitext)
-        except:
-            print 'source:\n', self.source_wikitext
-            print 'result:\n', self.converter.content
-            print 'target:\n', self.target_wikitext
-            raise
+        self.assertEqual(self.converter.content, self.target_wikitext)
 
 if __name__ == '__main__':
     unittest.main()
