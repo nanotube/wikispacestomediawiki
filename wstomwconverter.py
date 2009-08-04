@@ -60,6 +60,10 @@ class WikispacesToMediawikiConverter:
         self.content = open(filepath).read()
         
     def run(self):
+        self.run_regexps()
+        self.write_output()
+        
+    def run_regexps(self):
         '''Run some regexps on the source.'''
         
         # remove the [[toc]] since mediawiki does it by default
@@ -73,7 +77,7 @@ class WikispacesToMediawikiConverter:
         self.content = re.sub(r'\[\[(ftp://[^|]*)\|([^\]]*)\]\]', r'[\1 \2]', self.content)
         
         # change bold from ** to '''
-        self.content = re.sub(r'(?<!\n)\*{2}', "'''", self.content)
+        self.content = re.sub(r'(?<![\n\*])\*{2}', "'''", self.content)
         
         # convert the [[code]] tags to indented text
         def code_indent(matchobj):
@@ -119,8 +123,6 @@ class WikispacesToMediawikiConverter:
             return '[[File:' + image_filename + image_width + image_align + image_comment
             
         self.content = re.sub(r'\[\[image:[^\]]+', image_parse, self.content)
-        
-        self.write_output()
         
     def write_output(self):
         output_filepath = os.path.join(os.path.dirname(self.filepath), 
