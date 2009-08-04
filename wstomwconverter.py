@@ -65,13 +65,30 @@ class WikispacesToMediawikiConverter:
         
     def run_regexps(self):
         '''Run some regexps on the source.'''
+        self.parse_toc()
+        self.parse_italics()        
+        self.parse_external_links()        
+        self.parse_bold()
+        self.parse_code()
+        self.parse_images()
         
-        # remove the [[toc]] since mediawiki does it by default
+    def parse_toc(self):
+        '''remove the [[toc]] since mediawiki does it by default'''
         self.content = re.sub(r'\[\[toc(\|flat)?\]\]', r'', self.content)
-        
-        #change italics from // to ''
+    
+    def parse_italics(self):
+        """change italics from // to ''"""
         self.content = re.sub(r'(?<!http:)(?<!https:)(?<!ftp:)//', r"''", self.content)
+    
+    def parse_external_links(self):
+        '''change external link format, and free 'naked' external links.
         
+        external links with labels get single-braces instead of double
+        and space instead of pipe as delimiter between url and label
+        
+        naked external links (those without label) simply get stripped of
+        braces, since that produces the equivalent output in mediawiki.
+        '''
         # change external link format
         self.content = re.sub(r'\[\[(https?://[^|\]]*)\|([^\]]*)\]\]', r'[\1 \2]', self.content)
         self.content = re.sub(r'\[\[(ftp://[^|\]]*)\|([^\]]*)\]\]', r'[\1 \2]', self.content)
@@ -79,11 +96,21 @@ class WikispacesToMediawikiConverter:
         # free naked external links
         self.content = re.sub(r'\[\[(https?://[^|\]]*)\]\]', r'\1', self.content)
         self.content = re.sub(r'\[\[(ftp://[^|\]]*)\]\]', r'\1', self.content)
-        
-        # change bold from ** to '''
+    
+    def parse_bold(self):
+        """change bold from ** to '''"""
         self.content = re.sub(r'(?<![\n\*])\*{2}', "'''", self.content)
+    
+    def parse_code(self):
+        '''convert the [[code]] tags to indented text
         
-        # convert the [[code]] tags to indented text
+        by default mediawiki doesn't support code highlighting, so that info
+        is lost in conversion.
+        
+        there are mediawiki extensions that do support it, such as GeSHi,
+        but they are not included in the default install. 
+        
+        maybe will add optional support for that with an extra cli option.'''
         def code_indent(matchobj):
             code = matchobj.group(2)
             if self.options.debug:
@@ -92,8 +119,12 @@ class WikispacesToMediawikiConverter:
             indented_code = '\n'.join([' '+line for line in code_lines])
             return indented_code
         self.content = re.sub(r'(?s)\[\[code( +format=".*?")?\]\](.*?)\[\[code\]\]', code_indent, self.content)
+
+    def parse_images(self):
+        '''convert [[image:...]] tags to [[File:...]] tags.
         
-        # convert [[image:...]] tags to [[File:...]] tags.
+        various image attributes are supported:
+        align, width, height, caption, link.'''
         def image_parse(matchobj):
             imagetag = matchobj.group(0)
             if self.options.debug:
