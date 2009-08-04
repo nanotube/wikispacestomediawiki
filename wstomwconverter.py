@@ -71,6 +71,7 @@ class WikispacesToMediawikiConverter:
         self.parse_bold()
         self.parse_code()
         self.parse_images()
+        self.parse_indents()
         
     def parse_toc(self):
         '''remove the [[toc]] since mediawiki does it by default'''
@@ -110,7 +111,8 @@ class WikispacesToMediawikiConverter:
         there are mediawiki extensions that do support it, such as GeSHi,
         but they are not included in the default install. 
         
-        maybe will add optional support for that with an extra cli option.'''
+        maybe will add optional support for that with an extra cli option.
+        '''
         def code_indent(matchobj):
             code = matchobj.group(2)
             if self.options.debug:
@@ -124,7 +126,8 @@ class WikispacesToMediawikiConverter:
         '''convert [[image:...]] tags to [[File:...]] tags.
         
         various image attributes are supported:
-        align, width, height, caption, link.'''
+        align, width, height, caption, link.
+        '''
         def image_parse(matchobj):
             imagetag = matchobj.group(0)
             if self.options.debug:
@@ -158,7 +161,18 @@ class WikispacesToMediawikiConverter:
             return '[[File:' + image_filename + image_width + image_align + image_comment
             
         self.content = re.sub(r'\[\[image:[^\]]+', image_parse, self.content)
+    
+    def parse_indents(self):
+        '''change indent from > to :'''
+        def replace_indents(matchobj):
+            indents = matchobj.group(0)
+            if self.options.debug:
+                print indents
+            indents = indents.replace('>', ':')
+            return indents
         
+        self.content = re.sub(r'(?m)^>+', replace_indents, self.content)
+    
     def write_output(self):
         output_filepath = os.path.join(os.path.dirname(self.filepath), 
                             os.path.basename(self.filepath) + '_mediawiki')

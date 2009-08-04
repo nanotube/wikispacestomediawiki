@@ -234,5 +234,26 @@ A paragraph with a medium-complexity image: [[File:somefile.gif|right]]
         self.converter.run_regexps()
         self.assertEqual(self.converter.content, self.target_wikitext)
 
+    def test_indents(self):
+        self.source_wikitext = \
+"""
+A paragraph with some <stuff>
+
+> an indented paragraph
+
+>> an even more indented paragraph with some > stuff.
+"""
+        self.target_wikitext = \
+"""
+A paragraph with some <stuff>
+
+: an indented paragraph
+
+:: an even more indented paragraph with some > stuff.
+"""
+        self.converter.content = self.source_wikitext
+        self.converter.run_regexps()
+        self.assertEqual(self.converter.content, self.target_wikitext)
+
 if __name__ == '__main__':
     unittest.main()
