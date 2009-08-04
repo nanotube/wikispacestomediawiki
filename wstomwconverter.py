@@ -73,8 +73,12 @@ class WikispacesToMediawikiConverter:
         self.content = re.sub(r'(?<!http:)(?<!https:)(?<!ftp:)//', r"''", self.content)
         
         # change external link format
-        self.content = re.sub(r'\[\[(https?://[^|]*)\|([^\]]*)\]\]', r'[\1 \2]', self.content)
-        self.content = re.sub(r'\[\[(ftp://[^|]*)\|([^\]]*)\]\]', r'[\1 \2]', self.content)
+        self.content = re.sub(r'\[\[(https?://[^|\]]*)\|([^\]]*)\]\]', r'[\1 \2]', self.content)
+        self.content = re.sub(r'\[\[(ftp://[^|\]]*)\|([^\]]*)\]\]', r'[\1 \2]', self.content)
+        
+        # free naked external links
+        self.content = re.sub(r'\[\[(https?://[^|\]]*)\]\]', r'\1', self.content)
+        self.content = re.sub(r'\[\[(ftp://[^|\]]*)\]\]', r'\1', self.content)
         
         # change bold from ** to '''
         self.content = re.sub(r'(?<![\n\*])\*{2}', "'''", self.content)
