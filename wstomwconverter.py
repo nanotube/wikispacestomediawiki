@@ -62,7 +62,8 @@ class WikispacesToMediawikiConverter:
         self.filepath = filepath
         self.options = options
         
-        self.content = open(filepath).read()
+        # the 'rU' mode should convert any \r\n to plain \n.
+        self.content = open(filepath, 'rU').read()
         
     def run(self):
         self.run_regexps()
