@@ -130,7 +130,11 @@ class WikispacesToMediawikiConverter:
     
     def parse_bold(self):
         """change bold from ** to '''"""
-        self.content = re.sub(r'(?<![\n\*])\*{2}', "'''", self.content)
+        def replace_bold(matchobj):
+            text = matchobj.group(0)
+            text = text.replace('**', "'''")
+            return text
+        self.content = re.sub(r'(?<![\n\*])\*{2,}', replace_bold, self.content)
     
     def parse_code(self):
         '''convert the [[code]] tags to indented text
