@@ -39,7 +39,7 @@ class Starter:
         '''
         parser = optparse.OptionParser(
                         version=VersionInfo.name + " version " +VersionInfo.version + "\nProject homepage: " + VersionInfo.url, 
-                        description="This script can convert a Mikispaces-style source page into a MediaWiki-style source page. For a more detailed usage manual, see the project homepage: " + VersionInfo.url, 
+                        description="This script can convert a Wikispaces-style source page into a MediaWiki-style source page. For a more detailed usage manual, see the project homepage: " + VersionInfo.url, 
                         formatter=optparse.TitledHelpFormatter(),
                         usage="%prog [options]\n or \n  python %prog [options]")
         parser.add_option("-d", "--debug", action="store_true", dest="debug", help="debug mode (print some extra debug output). [default: %default]")
