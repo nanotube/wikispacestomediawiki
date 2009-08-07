@@ -147,6 +147,20 @@ monospaced</tt> text.
         self.converter.content = self.source_wikitext
         self.converter.run_regexps()
         self.assertEqual(self.converter.content, self.target_wikitext)
+
+    def test_variables(self):
+        self.source_wikitext = \
+"""
+A paragraph with {$page} in it.
+"""
+        self.target_wikitext = \
+"""
+A paragraph with test.tmp in it.
+"""
+        self.converter.content = self.source_wikitext
+        self.converter.run_regexps()
+        self.assertEqual(self.converter.content, self.target_wikitext)
+
         
     def test_includes(self):
         self.source_wikitext = \

@@ -106,6 +106,7 @@ class WikispacesToMediawikiConverter:
         self.parse_bold()
         self.parse_underline()
         self.parse_monospaced()
+        self.parse_variables()
         self.parse_includes()
         self.parse_images()
         self.parse_indents()
@@ -171,6 +172,12 @@ class WikispacesToMediawikiConverter:
     def parse_monospaced(self):
         """change monospaced font from {{}} to <tt></tt>"""
         self.content = re.sub(r'(?s){{(.*?)}}', r'<tt>\1</tt>', self.content)
+    
+    def parse_variables(self):
+        """Parse variables.
+        
+        The only variable currently supported is {$page}"""
+        self.content = re.sub(r'{\$page}', os.path.basename(self.filepath), self.content)
     
     def parse_includes(self):
         """change includes from [[include...]] to {{}}"""
