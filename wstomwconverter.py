@@ -123,7 +123,6 @@ class WikispacesToMediawikiConverter:
             code = matchobj.group(2)
             if self.options.debug:
                 print code
-            print code
             if not matchobj.group(0).startswith('\n') and \
                     not code.startswith('\n'):
                 code = '\n' + code
@@ -131,14 +130,11 @@ class WikispacesToMediawikiConverter:
                     not code.endswith('\n'):
                 code = code + '\n'
             code_lines = code.split('\n')
-            print code_lines
             indented_code = '\n'.join([' '+line for line in code_lines])
-            print indented_code
             if indented_code.startswith(' \n'):
                 indented_code = indented_code[1:]
             if indented_code.endswith('\n '):
                 indented_code = indented_code[:-1]
-            print indented_code
             return indented_code
         self.content = re.sub(r'(?s)\n?\[\[code( +format=".*?")?\]\](.*?)\[\[code\]\]\n?', code_indent, self.content)
 

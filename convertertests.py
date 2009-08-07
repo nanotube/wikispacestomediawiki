@@ -255,6 +255,49 @@ A paragraph with some <stuff>
         self.converter.content = self.source_wikitext
         self.converter.run_regexps()
         self.assertEqual(self.converter.content, self.target_wikitext)
+        
+    def test_tables(self):
+        self.source_wikitext = \
+"""
+A paragraph...
+
+|| A simple || table ||
+|| with two || rows ||
+
+|| a table || with a
+
+multiline cell ||
+|| and another
+multiline cell || and a cell ||
+"""
+        self.target_wikitext = \
+"""
+A paragraph...
+
+{| style="border: 1px solid #c6c9ff; border-collapse: collapse;" cellspacing="0" cellpadding="10" border="1"
+|-
+| A simple 
+| table 
+|-
+| with two 
+| rows 
+|}
+
+{| style="border: 1px solid #c6c9ff; border-collapse: collapse;" cellspacing="0" cellpadding="10" border="1"
+|-
+| a table 
+| with a
+
+multiline cell 
+|-
+| and another
+multiline cell 
+| and a cell 
+|}
+"""
+        self.converter.content = self.source_wikitext
+        self.converter.run_regexps()
+        self.assertEqual(self.converter.content, self.target_wikitext)
 
 if __name__ == '__main__':
     unittest.main()
