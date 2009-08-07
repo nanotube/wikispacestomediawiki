@@ -118,8 +118,6 @@ A paragraph...
 A paragraph...
 
 
-
-
 """
         self.converter.content = self.source_wikitext
         self.converter.run_regexps()
@@ -195,17 +193,14 @@ A paragraph with
  some code in it
 .
 
-
  Some
  multiline
  code
-
 
 Yet another paragraph with 
  some
  multiline
  code
-
 """
         self.converter.content = self.source_wikitext
         self.converter.run_regexps()

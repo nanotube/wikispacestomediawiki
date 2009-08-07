@@ -81,7 +81,7 @@ class WikispacesToMediawikiConverter:
         
     def parse_toc(self):
         '''remove the [[toc]] since mediawiki does it by default'''
-        self.content = re.sub(r'\[\[toc(\|flat)?\]\]', r'', self.content)
+        self.content = re.sub(r'\n?\[\[toc(\|flat)?\]\]', r'', self.content)
     
     def parse_italics(self):
         """change italics from // to ''"""
@@ -123,10 +123,24 @@ class WikispacesToMediawikiConverter:
             code = matchobj.group(2)
             if self.options.debug:
                 print code
+            print code
+            if not matchobj.group(0).startswith('\n') and \
+                    not code.startswith('\n'):
+                code = '\n' + code
+            if not matchobj.group(0).endswith('\n') and \
+                    not code.endswith('\n'):
+                code = code + '\n'
             code_lines = code.split('\n')
+            print code_lines
             indented_code = '\n'.join([' '+line for line in code_lines])
+            print indented_code
+            if indented_code.startswith(' \n'):
+                indented_code = indented_code[1:]
+            if indented_code.endswith('\n '):
+                indented_code = indented_code[:-1]
+            print indented_code
             return indented_code
-        self.content = re.sub(r'(?s)\[\[code( +format=".*?")?\]\](.*?)\[\[code\]\]', code_indent, self.content)
+        self.content = re.sub(r'(?s)\n?\[\[code( +format=".*?")?\]\](.*?)\[\[code\]\]\n?', code_indent, self.content)
 
     def parse_images(self):
         '''convert [[image:...]] tags to [[File:...]] tags.
