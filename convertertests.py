@@ -256,7 +256,7 @@ A paragraph with some <stuff>
         self.converter.run_regexps()
         self.assertEqual(self.converter.content, self.target_wikitext)
         
-    def test_tables(self):
+    def test_tables_simple(self):
         self.source_wikitext = \
 """
 A paragraph...
@@ -293,6 +293,49 @@ multiline cell
 | and another
 multiline cell 
 | and a cell 
+|}
+"""
+        self.converter.content = self.source_wikitext
+        self.converter.run_regexps()
+        self.assertEqual(self.converter.content, self.target_wikitext)
+
+    def test_tables_fancy(self):
+        self.source_wikitext = \
+"""
+A paragraph...
+
+||~ heading1 ||~ heading2 ||
+||= aligned center ||> aligned right ||
+
+||~ a table ||~ with a
+
+multiline cell ||
+||> and another
+multiline cell ||= and a cell ||
+"""
+        self.target_wikitext = \
+"""
+A paragraph...
+
+{| style="border: 1px solid #c6c9ff; border-collapse: collapse;" cellspacing="0" cellpadding="10" border="1"
+|-
+! heading1 
+! heading2 
+|-
+|align="center" | aligned center 
+|align="right" | aligned right 
+|}
+
+{| style="border: 1px solid #c6c9ff; border-collapse: collapse;" cellspacing="0" cellpadding="10" border="1"
+|-
+! a table 
+! with a
+
+multiline cell 
+|-
+|align="right" | and another
+multiline cell 
+|align="center" | and a cell 
 |}
 """
         self.converter.content = self.source_wikitext

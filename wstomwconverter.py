@@ -262,7 +262,19 @@ class WikispacesToMediawikiConverter:
                 output_row = '|-\n'
                 cells = re.findall(r'(?s)(?<=\|\|)(.*?)(?=\|\|)', row)
                 for cell in cells:
-                    output_row = output_row + '|' + cell + '\n'
+                    if cell.startswith('='):
+                        cell_type = '|align="center" |'
+                        cell = cell[1:]
+                    elif cell.startswith('>'):
+                        cell_type = '|align="right" |'
+                        cell = cell[1:]
+                    elif cell.startswith('~'):
+                        cell_type = '!'
+                        cell = cell[1:]
+                    else:
+                        cell_type = '|'
+                        
+                    output_row = output_row + cell_type + cell + '\n'
                 output_table += output_row
                 
             output_table += '|}'
