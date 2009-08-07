@@ -145,6 +145,35 @@ monospaced</tt> text.
         self.converter.content = self.source_wikitext
         self.converter.run_regexps()
         self.assertEqual(self.converter.content, self.target_wikitext)
+        
+    def test_includes(self):
+        self.source_wikitext = \
+"""
+A paragraph.
+
+[[include page="somepage"]]
+
+[[include page="somepage" title="some title"]]
+
+[[include page="somepage" editable="true"]]
+
+[[include page="somepage" wrap="true"]]
+"""
+        self.target_wikitext = \
+"""
+A paragraph.
+
+{{:somepage}}
+
+{{:somepage}}
+
+{{:somepage}}
+
+{{:somepage}}
+"""
+        self.converter.content = self.source_wikitext
+        self.converter.run_regexps()
+        self.assertEqual(self.converter.content, self.target_wikitext)
 
     def test_toc(self):
         self.source_wikitext = \

@@ -101,6 +101,7 @@ class WikispacesToMediawikiConverter:
         self.parse_bold()
         self.parse_underline()
         self.parse_monospaced()
+        self.parse_includes()
         self.parse_images()
         self.parse_indents()
         self.parse_tables()
@@ -149,6 +150,10 @@ class WikispacesToMediawikiConverter:
     def parse_monospaced(self):
         """change monospaced font from {{}} to <tt></tt>"""
         self.content = re.sub(r'(?s){{(.*?)}}', r'<tt>\1</tt>', self.content)
+    
+    def parse_includes(self):
+        """change includes from [[include...]] to {{}}"""
+        self.content = re.sub(r'\[\[include page="([^"]*?)"[^\]]*?\]\]', r'{{:\1}}', self.content)
     
     def parse_code(self):
         '''convert the [[code]] tags to <pre> tags.
