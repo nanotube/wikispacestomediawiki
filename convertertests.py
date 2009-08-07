@@ -104,6 +104,27 @@ A paragraph with a url: http://www.google.com/
         self.converter.run_regexps()
         self.assertEqual(self.converter.content, self.target_wikitext)
 
+    def test_underline(self):
+        self.source_wikitext = \
+"""
+A paragraph with __some underlined text__ in it.
+
+Some __multiline
+
+underlined__ text.
+"""
+        self.target_wikitext = \
+"""
+A paragraph with <u>some underlined text</u> in it.
+
+Some <u>multiline
+
+underlined</u> text.
+"""
+        self.converter.content = self.source_wikitext
+        self.converter.run_regexps()
+        self.assertEqual(self.converter.content, self.target_wikitext)
+
     def test_toc(self):
         self.source_wikitext = \
 """

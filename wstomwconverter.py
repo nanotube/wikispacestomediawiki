@@ -99,6 +99,7 @@ class WikispacesToMediawikiConverter:
         self.parse_italics()        
         self.parse_external_links()        
         self.parse_bold()
+        self.parse_underline()
         self.parse_images()
         self.parse_indents()
         self.parse_tables()
@@ -139,6 +140,10 @@ class WikispacesToMediawikiConverter:
             text = text.replace('**', "'''")
             return text
         self.content = re.sub(r'(?<![\n\*])\*{2,}', replace_bold, self.content)
+        
+    def parse_underline(self):
+        """change underline from __ to <u></u>"""
+        self.content = re.sub(r'(?s)__(.*?)__', r'<u>\1</u>', self.content)
     
     def parse_code(self):
         '''convert the [[code]] tags to indented text
