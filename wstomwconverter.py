@@ -100,6 +100,7 @@ class WikispacesToMediawikiConverter:
         self.parse_external_links()        
         self.parse_bold()
         self.parse_underline()
+        self.parse_monospaced()
         self.parse_images()
         self.parse_indents()
         self.parse_tables()
@@ -144,6 +145,10 @@ class WikispacesToMediawikiConverter:
     def parse_underline(self):
         """change underline from __ to <u></u>"""
         self.content = re.sub(r'(?s)__(.*?)__', r'<u>\1</u>', self.content)
+        
+    def parse_monospaced(self):
+        """change monospaced font from {{}} to <tt></tt>"""
+        self.content = re.sub(r'(?s){{(.*?)}}', r'<tt>\1</tt>', self.content)
     
     def parse_code(self):
         '''convert the [[code]] tags to indented text

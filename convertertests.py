@@ -124,6 +124,27 @@ underlined</u> text.
         self.converter.content = self.source_wikitext
         self.converter.run_regexps()
         self.assertEqual(self.converter.content, self.target_wikitext)
+        
+    def test_monospaced(self):
+        self.source_wikitext = \
+"""
+A paragraph with {{some monospaced text}} in it.
+
+Some {{multiline
+
+monospaced}} text.
+"""
+        self.target_wikitext = \
+"""
+A paragraph with <tt>some monospaced text</tt> in it.
+
+Some <tt>multiline
+
+monospaced</tt> text.
+"""
+        self.converter.content = self.source_wikitext
+        self.converter.run_regexps()
+        self.assertEqual(self.converter.content, self.target_wikitext)
 
     def test_toc(self):
         self.source_wikitext = \
