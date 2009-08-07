@@ -151,7 +151,7 @@ class WikispacesToMediawikiConverter:
         self.content = re.sub(r'(?s){{(.*?)}}', r'<tt>\1</tt>', self.content)
     
     def parse_code(self):
-        '''convert the [[code]] tags to indented text
+        '''convert the [[code]] tags to <pre> tags.
         
         by default mediawiki doesn't support code highlighting, so that info
         is lost in conversion.
@@ -161,24 +161,12 @@ class WikispacesToMediawikiConverter:
         
         maybe will add optional support for that with an extra cli option.
         '''
-        def code_indent(matchobj):
+        def code_replace(matchobj):
             code = matchobj.group(2)
             if self.options.debug:
                 print code
-            if not matchobj.group(0).startswith('\n') and \
-                    not code.startswith('\n'):
-                code = '\n' + code
-            if not matchobj.group(0).endswith('\n') and \
-                    not code.endswith('\n'):
-                code = code + '\n'
-            code_lines = code.split('\n')
-            indented_code = '\n'.join([' '+line for line in code_lines])
-            if indented_code.startswith(' \n'):
-                indented_code = indented_code[1:]
-            if indented_code.endswith('\n '):
-                indented_code = indented_code[:-1]
-            return indented_code
-        self.content = re.sub(r'(?s)\n?\[\[code( +format=".*?")?\]\](.*?)\[\[code\]\]\n?', code_indent, self.content)
+            return '<pre>' + code + '</pre>'
+        self.content = re.sub(r'(?s)\[\[code( +format=".*?")?\]\](.*?)\[\[code\]\]', code_replace, self.content)
 
     def parse_images(self):
         '''convert [[image:...]] tags to [[File:...]] tags.

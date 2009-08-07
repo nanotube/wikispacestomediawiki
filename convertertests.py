@@ -231,18 +231,18 @@ code
 """
         self.target_wikitext = \
 """
-A paragraph with 
- some code in it
-.
+A paragraph with <pre>some code in it</pre>.
 
- Some
- multiline
- code
+<pre>
+Some
+multiline
+code
+</pre>
 
-Yet another paragraph with 
- some
- multiline
- code
+Yet another paragraph with <pre>some
+multiline
+code
+</pre>
 """
         self.converter.content = self.source_wikitext
         self.converter.run_regexps()
@@ -266,18 +266,18 @@ code
 """
         self.target_wikitext = \
 """
-A paragraph with 
- some code **in it**
-.
+A paragraph with <pre>some code **in it**</pre>.
 
- Some
- multiline [[http://somestuff.com|morestuff]]
- code
+<pre>
+Some
+multiline [[http://somestuff.com|morestuff]]
+code
+</pre>
 
-Yet another paragraph with 
- some
- //multiline//
- code
+Yet another paragraph with <pre>some
+//multiline//
+code
+</pre>
 """
         self.converter.content = self.source_wikitext
         self.converter.run_regexps()
