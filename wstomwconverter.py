@@ -15,6 +15,7 @@
 import re
 import optparse
 import os.path
+import random
 
 class VersionInfo:
     '''Just a container for some information.'''
@@ -93,14 +94,17 @@ class WikispacesToMediawikiConverter:
     def run_regexps(self):
         '''Run some regexps on the source.'''
         self.extend_edges()
+        self.extract_verbatim() # take out code and escapes
         self.parse_toc()
         self.parse_italics()        
         self.parse_external_links()        
         self.parse_bold()
-        self.parse_code()
         self.parse_images()
         self.parse_indents()
         self.parse_tables()
+        self.restore_verbatim() # restore code and escapes
+        self.parse_code()
+        self.parse_escapes()
         self.restore_edges()
         
     def parse_toc(self):
@@ -287,6 +291,32 @@ class WikispacesToMediawikiConverter:
         
         self.content = re.sub(r'(?s)(?<=\n)([|][|].*?[|][|])(?=\n[^|]|\n[|][^|])', 
                 replace_tables, self.content)
+    
+    def extract_verbatim(self):
+        '''Take out sections that should remain unparsed.
+        
+        Store them in a dict, leave placeholders in content.
+        '''
+        self.verbatim_dict = {}
+        def replace_verbatim(matchobj):
+            while True:
+                key = 'verbatim_placeholder_' + str(random.randint(1, 1e15))
+                if key not in self.verbatim_dict.keys():
+                    break
+            self.verbatim_dict[key] = matchobj.group(0)
+            return key
+        
+        self.content = re.sub(r'(?s)\n?\[\[code( +format=".*?")?\]\](.*?)\[\[code\]\]\n?', replace_verbatim, self.content)
+        self.content = re.sub(r'``(.*)``', replace_verbatim, self.content)
+        
+    def restore_verbatim(self):
+        '''Restore verbatim sections taken out by extract_verbatim.'''
+        for key in self.verbatim_dict.keys():
+            self.content = self.content.replace(key, self.verbatim_dict[key])
+        
+    def parse_escapes(self):
+        '''Replace escapes '``' with '<nowiki>' tags.'''
+        self.content = re.sub(r'``(.*)``', r'<nowiki>\1</nowiki>', self.content)
     
     def write_output(self):
         output_filepath = os.path.join(os.path.dirname(self.filepath), 

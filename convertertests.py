@@ -205,7 +205,42 @@ Yet another paragraph with
         self.converter.content = self.source_wikitext
         self.converter.run_regexps()
         self.assertEqual(self.converter.content, self.target_wikitext)
-        
+
+    def test_code_tags_verbatim(self):
+        self.source_wikitext = \
+"""
+A paragraph with [[code]]some code **in it**[[code]].
+
+[[code]]
+Some
+multiline [[http://somestuff.com|morestuff]]
+code
+[[code]]
+
+Yet another paragraph with [[code]]some
+//multiline//
+code
+[[code]]
+"""
+        self.target_wikitext = \
+"""
+A paragraph with 
+ some code **in it**
+.
+
+ Some
+ multiline [[http://somestuff.com|morestuff]]
+ code
+
+Yet another paragraph with 
+ some
+ //multiline//
+ code
+"""
+        self.converter.content = self.source_wikitext
+        self.converter.run_regexps()
+        self.assertEqual(self.converter.content, self.target_wikitext)
+
     def test_image_tags(self):
         self.source_wikitext = \
 """
@@ -337,6 +372,23 @@ multiline cell
 multiline cell 
 |align="center" | and a cell 
 |}
+"""
+        self.converter.content = self.source_wikitext
+        self.converter.run_regexps()
+        self.assertEqual(self.converter.content, self.target_wikitext)
+
+    def test_escapes(self):
+        self.source_wikitext = \
+"""
+A paragraph with some ``escaped stuff``.
+
+A paragraph with some ``escaped stuff that would **otherwise be parsed**``.
+"""
+        self.target_wikitext = \
+"""
+A paragraph with some <nowiki>escaped stuff</nowiki>.
+
+A paragraph with some <nowiki>escaped stuff that would **otherwise be parsed**</nowiki>.
 """
         self.converter.content = self.source_wikitext
         self.converter.run_regexps()
