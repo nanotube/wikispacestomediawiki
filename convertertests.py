@@ -349,6 +349,41 @@ code
         self.converter.run_regexps()
         self.assertEqual(self.converter.content, self.target_wikitext)
 
+    def test_math_tags(self):
+        self.source_wikitext = \
+"""
+A paragraph with [[math]]some math in it[[math]].
+
+[[math]]
+Some
+multiline
+math
+[[math]]
+
+Yet another paragraph with [[math]]some
+multiline
+math
+[[math]]
+"""
+        self.target_wikitext = \
+"""
+A paragraph with <math>some math in it</math>.
+
+<math>
+Some
+multiline
+math
+</math>
+
+Yet another paragraph with <math>some
+multiline
+math
+</math>
+"""
+        self.converter.content = self.source_wikitext
+        self.converter.run_regexps()
+        self.assertEqual(self.converter.content, self.target_wikitext)
+
     def test_image_tags(self):
         self.source_wikitext = \
 """

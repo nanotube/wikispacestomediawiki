@@ -112,6 +112,7 @@ class WikispacesToMediawikiConverter:
         self.parse_tables()
         self.restore_verbatim() # restore code and escapes
         self.parse_code()
+        self.parse_math()
         self.parse_escapes()
         self.restore_edges()
         
@@ -192,6 +193,15 @@ class WikispacesToMediawikiConverter:
                 print code
             return '<pre>' + code + '</pre>'
         self.content = re.sub(r'(?s)\[\[code( +format=".*?")?\]\](.*?)\[\[code\]\]', code_replace, self.content)
+        
+    def parse_math(self):
+        '''convert the [[math]] tags to <math> tags.'''
+        def math_replace(matchobj):
+            code = matchobj.group(2)
+            if self.options.debug:
+                print code
+            return '<math>' + code + '</math>'
+        self.content = re.sub(r'(?s)\[\[math( +format=".*?")?\]\](.*?)\[\[math\]\]', math_replace, self.content)
 
     def parse_images(self):
         '''convert [[image:...]] tags to [[File:...]] tags.
@@ -331,6 +341,7 @@ class WikispacesToMediawikiConverter:
         
         self.content = re.sub(r'(?s)\n?\[\[code( +format=".*?")?\]\](.*?)\[\[code\]\]\n?', replace_verbatim, self.content)
         self.content = re.sub(r'``(.*)``', replace_verbatim, self.content)
+        self.content = re.sub(r'(?s)\[\[math( +format=".*?")?\]\](.*?)\[\[math\]\]', replace_verbatim, self.content)
         
     def restore_verbatim(self):
         '''Restore verbatim sections taken out by extract_verbatim.'''
