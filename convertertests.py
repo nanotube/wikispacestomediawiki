@@ -11,6 +11,8 @@ class TestConverter(unittest.TestCase):
     
         options = OptionsContainer()
         options.debug=False
+        options.usemedia=False
+        options.filelocation="http://localhost/files/"
         
         self.converter = wstomwconverter.WikispacesToMediawikiConverter(filepath, 
                         options)
@@ -239,6 +241,41 @@ And another one https://example.com.
 A really naked one here: http://example.com. Nothing should happen to it.
 """
         self.converter.content = self.source_wikitext
+        self.converter.run_regexps()
+        self.assertEqual(self.converter.content, self.target_wikitext)
+
+    def test_file_links(self):
+        self.source_wikitext = \
+"""
+A paragraph with [[file:somefile.doc]].
+
+Another paragraph with [[file:somefile.tex|a tex file]].
+"""
+        self.target_wikitext = \
+"""
+A paragraph with [http://localhost/files/somefile.doc somefile.doc].
+
+Another paragraph with [http://localhost/files/somefile.tex a tex file].
+"""
+        self.converter.content = self.source_wikitext
+        self.converter.run_regexps()
+        self.assertEqual(self.converter.content, self.target_wikitext)
+
+    def test_file_links_withmedia(self):
+        self.source_wikitext = \
+"""
+A paragraph with [[file:somefile.doc]].
+
+Another paragraph with [[file:somefile.tex|a tex file]].
+"""
+        self.target_wikitext = \
+"""
+A paragraph with [[Media:somefile.doc]].
+
+Another paragraph with [[Media:somefile.tex|a tex file]].
+"""
+        self.converter.content = self.source_wikitext
+        self.converter.options.usemedia = True
         self.converter.run_regexps()
         self.assertEqual(self.converter.content, self.target_wikitext)
 

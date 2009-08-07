@@ -44,9 +44,13 @@ class Starter:
                         usage="%prog [options]\n or \n  python %prog [options]")
         parser.add_option("-d", "--debug", action="store_true", dest="debug", help="debug mode (print some extra debug output). [default: %default]")
         parser.add_option("-f", "--file", action="append", dest="file", help="Specify filepath to convert. For multiple files use this option multiple times. [default: %default]")
+        parser.add_option("-l", "--filelocation", action="store", dest="filelocation", help="Specify the full URL of directory where files are hosted. This will be used to convert [[file:...]] links to external links. [default: %default]")
+        parser.add_option("-m", "--usemedia", action="store_true", dest="usemedia", help="Use the [[Media:...]] tag instead of external links to convert [[file:...]] links. Note that by default Mediawiki doesn't allow uploads of non-image files. [default: %default]")
         
         parser.set_defaults(debug=False, 
-                            file=[])
+                            file=[],
+                            filelocation="http://localhost/files/",
+                            usemedia=False)
         
         (self.options, args) = parser.parse_args()
         if self.options.debug:
@@ -96,8 +100,9 @@ class WikispacesToMediawikiConverter:
         self.extend_edges()
         self.extract_verbatim() # take out code and escapes
         self.parse_toc()
-        self.parse_italics()        
-        self.parse_external_links()        
+        self.parse_italics()
+        self.parse_external_links()
+        self.parse_file_links()
         self.parse_bold()
         self.parse_underline()
         self.parse_monospaced()
@@ -134,7 +139,22 @@ class WikispacesToMediawikiConverter:
         # free naked external links
         self.content = re.sub(r'\[\[(https?://[^|\]]*)\]\]', r'\1', self.content)
         self.content = re.sub(r'\[\[(ftp://[^|\]]*)\]\]', r'\1', self.content)
-    
+        
+    def parse_file_links(self):
+        '''change file link format to external links.
+        
+        file links with labels get the label.
+        file links without label get filename as label.
+        location of file is specified with cli argument.
+        '''
+        if not self.options.usemedia:
+            # change [[file:...]] links to external links
+            self.content = re.sub(r'\[\[file:([^|\]]*)\|([^\]]*)\]\]', r'[' + self.options.filelocation + r'\1 \2]', self.content)
+            self.content = re.sub(r'\[\[file:([^|\]]*)\]\]', r'[' + self.options.filelocation + r'\1 \1]', self.content)
+        else:
+            self.content = re.sub(r'\[\[file:([^|\]]*)\|([^\]]*)\]\]', r'[[Media:\1|\2]]', self.content)
+            self.content = re.sub(r'\[\[file:([^|\]]*)\]\]', r'[[Media:\1]]', self.content)
+            
     def parse_bold(self):
         """change bold from ** to '''"""
         def replace_bold(matchobj):
