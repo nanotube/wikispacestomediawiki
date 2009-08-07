@@ -62,15 +62,37 @@ class WikispacesToMediawikiConverter:
         self.filepath = filepath
         self.options = options
         
+        self.extended_start = False
+        self.extended_end = False
+        
         # the 'rU' mode should convert any \r\n to plain \n.
         self.content = open(filepath, 'rU').read()
         
     def run(self):
         self.run_regexps()
         self.write_output()
+    
+    def extend_edges(self):
+        '''Make sure the content starts and ends with a newline.
         
+        This is to simplify our regexp matching patterns.
+        '''
+        if not self.content.startswith('\n'):
+            self.content = '\n' + self.content
+            self.extended_start = True
+        if not self.content.endswith('\n\n'):
+            self.content = self.content + '\n\n'
+            self.extended_end = True
+            
+    def restore_edges(self):
+        if self.extended_start:
+            self.content = self.content[1:]
+        if self.extended_end:
+            self.content = self.content[:-2]
+    
     def run_regexps(self):
         '''Run some regexps on the source.'''
+        self.extend_edges()
         self.parse_toc()
         self.parse_italics()        
         self.parse_external_links()        
@@ -78,6 +100,8 @@ class WikispacesToMediawikiConverter:
         self.parse_code()
         self.parse_images()
         self.parse_indents()
+        self.parse_tables()
+        self.restore_edges()
         
     def parse_toc(self):
         '''remove the [[toc]] since mediawiki does it by default'''
@@ -222,6 +246,31 @@ class WikispacesToMediawikiConverter:
             return indents
         
         self.content = re.sub(r'(?m)^>+', replace_indents, self.content)
+    
+    def parse_tables(self):
+        '''convert wikispaces tables to mediawiki tables.'''
+        def replace_tables(matchobj):
+            atable = matchobj.group(0)
+            rows = atable.split('||\n')
+            for i, row in enumerate(rows):
+                if not row.endswith('||'):
+                    rows[i] = row + '||'
+            
+            output_table = '{| style="border: 1px solid #c6c9ff; border-collapse: collapse;" cellspacing="0" cellpadding="10" border="1"\n'
+            
+            for row in rows:
+                output_row = '|-\n'
+                cells = re.findall(r'(?s)(?<=\|\|)(.*?)(?=\|\|)', row)
+                for cell in cells:
+                    output_row = output_row + '|' + cell + '\n'
+                output_table += output_row
+                
+            output_table += '|}'
+            
+            return output_table
+        
+        self.content = re.sub(r'(?s)(?<=\n)([|][|].*?[|][|])(?=\n[^|]|\n[|][^|])', 
+                replace_tables, self.content)
     
     def write_output(self):
         output_filepath = os.path.join(os.path.dirname(self.filepath), 
